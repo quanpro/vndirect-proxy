@@ -15,7 +15,7 @@ as the statement of business requirement.
 | `Marico_MPS_MRP_Business_Requirements_Brief_v1.0.docx` | Word, 59 pages | The statement of business requirement: process, calculation logic, system boundary, interfaces, decisions, RACI, controls, 63 numbered requirements, NFRs, UAT scenarios, roadmap, risks, and a gap analysis against the vendor scope document. |
 | `Marico_MPS_MRP_Process_Infographic_v1.0.pptx` | PowerPoint, 6 slides | Editable process pack: swimlane process flow, system boundary and interface map, planning calendar and time fences, RACI at a glance, and a before/after comparison against the vendor scope. All native shapes — restyle or re-brand directly. |
 | `Marico_MPS_MRP_RACI_and_Registers_v1.0.xlsx` | Excel, 13 tabs | Filterable registers for the build team: RACI, interfaces, requirements, NFRs, master data ownership, controls, risks, gap analysis, decisions, open questions, UAT and roadmap. |
-| `Marico_MPS_Vietnam_Proposal_Assessment_v1.0.docx` | Word, 10 pages | **Annex D** — assessment of the *MPS Vietnam Data Architecture & Integration Document* (19 Nov 2026) against the target process and the 63-requirement register. Extends the gap register with G-16 to G-24, adds specification defects SD-01 to SD-05 and open decisions D-06 to D-08. |
+| `Marico_MPS_Vietnam_Proposal_Assessment_v1.0.docx` | Word, 12 pages | **Annex D** — assessment of the *MPS Vietnam Data Architecture & Integration Document* (19 Nov 2026), **scoped to master production scheduling only**. MRP, the material planner gate and release to SAP are deliberately not assessed. Extends the gap register with G-16 to G-24, adds specification defects SD-01 to SD-05, required additions RA-01 to RA-08 and open decisions D-06 and D-07. |
 
 ## The architecture in one sentence
 
@@ -53,19 +53,25 @@ and manages the purchase order, goods receipt and financial record.
 created, confirmed, backflushed and costed. Three options are documented with pros, cons
 and effort. Interface `IF-09` must not be built until this is closed.
 
-## Two proposals are live, and neither is complete
+## Two proposals are live, and both claim MPS
 
 | | Vendor scope document v1.0 | MPS Vietnam proposal |
 |---|---|---|
 | Master scheduling logic | Absent — delegated to SAP | **Present** — coverage-driven, weekly |
-| Constrained optimization | Absent | Absent |
-| BOM explosion and MRP | Delegated to SAP MRP | Absent |
-| Write-back to SAP | **Present** — PIR → PR | Absent — one-way flow |
-| Approval gates | Absent | Absent |
 | Where MPS runs | Inside SAP | SQL engine on the data warehouse |
+| Constrained optimization | Absent | Absent |
+| MPS approval gate | Absent | Absent |
+| Horizon | Not defined | 5 months, stated inconsistently |
+| Capacity master data | Not in scope | Not in scope |
 
-Between them, stages S3 (optimizer), S5 (MRP), S6 (confirmation gate) and S7 (release to
-SAP) have no owner. See Annex D for the full assessment and decisions D-06 to D-08.
+Both place master production scheduling in a different system, and neither delivers the
+constrained stage or the approval gate. See Annex D for the assessment and decisions
+D-06 and D-07.
+
+The MPS Vietnam proposal is scoped to MPS only, so Annex D does not assess MRP. Stages
+S5 to S7 of the target process — BOM explosion, the material planner confirmation gate
+and release to SAP — remain unaddressed by either document and will need their own
+scope and owner when the business is ready.
 
 ## Regenerating the documents
 

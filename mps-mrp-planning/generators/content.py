@@ -680,21 +680,27 @@ OPEN_QUESTIONS = [
 
 # ===========================================================================
 # ANNEX D - assessment of the MPS Vietnam proposal
-# (Marico - MPS Vietnam Data Architecture & Integration Document, 19 Nov 2026)
+# Scoped to master production scheduling only. MRP is not assessed here.
 # ===========================================================================
 ASSESS = {
     "doc_id": "BRD-MARICO-MPSMRP-v1.0-ANNEX-D",
     "title": "Assessment of the MPS Vietnam Proposal",
-    "subtitle": "Does it deliver the MPS and MRP capability the business requires?",
+    "subtitle": "Does it deliver the master production scheduling capability the business requires?",
     "assessed": "Marico - MPS Vietnam Data Architecture & Integration Document",
-    "assessed_short": "the MPS Vietnam proposal",
     "assessed_date": "19 November 2026",
     "pages": "5 pages, A4",
-    "verdict": "The proposal delivers one of the seven process stages in the target design, "
-               "and part of a second. It is a finished-goods inventory coverage planning tool. "
-               "It is not an MPS and MRP tool, and it should not be accepted as one.",
+    "scope_note": "This assessment treats the proposal as what it is: a master production "
+                  "scheduling proposal. Material requirements planning, BOM explosion, component "
+                  "netting and release of requirements to SAP are deliberately not assessed, "
+                  "because the proposal does not claim them. The question answered here is "
+                  "narrower and more useful: judged purely as an MPS, does it do the job?",
+    "verdict": "Judged purely as a master production scheduling proposal, it delivers two of the "
+               "four MPS process stages. The two it does not deliver - constrained optimization "
+               "against capacity, and the planner approval gate - are the two that distinguish a "
+               "master production schedule from an inventory coverage report.",
 }
 
+# Four MPS stages assessed; S5 to S7 are MRP and are not assessed.
 ASSESS_MAPPING = [
     ("S1", "Demand intake and forecast validation",
      "Ingests DP forecast, STO forecast, component forecast and production plan, all as manual "
@@ -707,20 +713,12 @@ ASSESS_MAPPING = [
      "Good match"),
     ("S3", "Constrained MPS optimization",
      "Nothing. No capacity constraint, no changeover matrix, no campaign grouping, no objective "
-     "function, no solver. Line utilisation appears in the interface as information only.",
+     "function, no solver. Line utilisation appears in the interface as information only, and the "
+     "capacity master data needed to build the constraint is not in the inbound scope.",
      "Absent"),
     ("S4", "MPS review and approval gate",
-     "Nothing. No plan version, no approval, no override capture, no reason codes, no frozen zone.",
-     "Absent"),
-    ("S5", "MRP explosion and netting",
-     "Nothing. No BOM explosion, no component netting, no lead-time offsetting, no material stock "
-     "norms, no shortage exceptions.",
-     "Absent"),
-    ("S6", "MRP confirmation gate",
-     "Nothing.", "Absent"),
-    ("S7", "Release to SAP, purchase requisition and purchase order",
-     "Nothing. The data flow is one-way from SAP into the warehouse and the application. There is "
-     "no outbound interface, no Planned Independent Requirement, no purchase requisition.",
+     "Nothing. No plan version, no approval step, no override capture, no reason codes, no frozen "
+     "zone. The plan is recalculated, not approved.",
      "Absent"),
 ]
 
@@ -728,27 +726,35 @@ ASSESS_COVERAGE = [
     ("Demand", 8, 1, 1, 6, "Weekly bucketing is native. Versioning, locking, duplicate control and "
                            "variance reporting are all absent, and the horizon is 5 months, not 12."),
     ("MPS", 7, 2, 4, 1, "The strongest area. Projected inventory and coverage profile are fully "
-                        "delivered and planning parameters sit outside SAP. Stock norm supports one "
-                        "policy only and the production quantity formula is not documented."),
-    ("Optimization", 12, 0, 1, 11, "Not in scope. The scenario simulator is a single what-if, not "
-                                   "saved and comparable scenarios."),
-    ("Workflow", 8, 0, 0, 8, "No approval gates, no override audit, no versioning, no exception "
-                             "workbench."),
-    ("MRP", 8, 0, 0, 8, "Not in scope in any form."),
-    ("Integration", 10, 0, 1, 9, "Inbound extraction only, and a thin subset of it. Every outbound "
-                                 "requirement is unaddressed."),
-    ("Data", 5, 1, 1, 3, "SAP is correctly the system of record. No change control, no master data "
-                         "exception routing, no retention policy."),
-    ("Control", 5, 0, 0, 5, "No reconciliation, no stability measurement, no orphan detection. "
-                            "Largely a consequence of there being no write-back."),
+                        "delivered and planning parameters sit outside SAP. The stock norm supports "
+                        "one policy only and the production quantity formula is not documented."),
+    ("Optimization", 12, 0, 1, 11, "Not addressed. The scenario simulator is a single what-if, not "
+                                   "saved and comparable scenarios, and nothing constrains the plan."),
+    ("Workflow (MPS gates)", 7, 0, 0, 7, "No approval gate, no plan version, no override audit, no "
+                                         "exception workbench, no escalation route."),
+    ("Integration (inbound)", 2, 0, 1, 1, "Automated SAP extraction exists but delta and full "
+                                          "handling is unspecified, and there is no snapshot "
+                                          "freshness control before a planning run."),
+    ("Data", 5, 1, 1, 3, "SAP is correctly the system of record. No parameter change control, no "
+                         "master data exception routing, no retention policy."),
+    ("Control (plan KPIs)", 3, 0, 0, 3, "No plan stability measurement, no MPS attainment "
+                                        "reporting, no forecast accuracy feedback into S&OP."),
 ]
+
+ASSESS_EXCLUDED = (
+    "Nineteen of the 63 requirements in the main register are excluded from this assessment as "
+    "out of scope: the eight MRP requirements REQ-501 to REQ-508; eight of the ten integration "
+    "requirements, which cover outbound release to SAP; REQ-402, the MRP planner confirmation "
+    "gate; and REQ-801 and REQ-802, which reconcile released requirements against SAP. That "
+    "leaves 44 requirements that a master production scheduling solution is expected to meet."
+)
 
 ASSESS_STRENGTHS = [
     ("The coverage model is the right shape for finished goods",
      "Policy Week as the target, Week Cover (Actual) measured against it, with red, amber and green "
      "banding at 3.0 weeks, 2.0 to 2.9 weeks and below 2.0 weeks. That is how a replenishment "
      "planner actually reasons, and it is a better starting point than anything in the vendor scope "
-     "document."),
+     "document assessed in Annex A."),
     ("Correct bucket granularity and a well-built time axis",
      "Weekly buckets with a tiered header carrying week commencing date, month-year and calendar "
      "week. This matches the tactical window in the target design."),
@@ -757,69 +763,51 @@ ASSESS_STRENGTHS = [
      "single Total Demand at plant and material level, which is the correct unit of planning."),
     ("Minimum order quantity treated as a real constraint",
      "Production is rounded to batch multiples, shown in the interface as 63,000 units across seven "
-     "batches. Lot sizing is handled rather than ignored."),
+     "batches. Lot sizing is handled rather than ignored, which many first-generation planning "
+     "tools get wrong."),
     ("Unavailable stock is separated",
      "In Transit and Quality Inspection are held as a distinct row, so the model does not treat "
      "every unit in the plant as available to promise."),
     ("Scenario simulation is already present",
      "The interface offers simulation of an additional production run to resolve a forward stock "
-     "dip. The instinct to let planners test an intervention before committing is right."),
-    ("Calculation sits outside SAP",
-     "The architectural direction matches the agreed target: SAP supplies data, the planning "
-     "calculation happens elsewhere."),
+     "dip. The instinct to let a planner test an intervention before committing is right, and it is "
+     "the foundation the constrained stage would build on."),
+    ("The calculation sits outside SAP",
+     "The architectural direction matches the agreed target: SAP supplies the data, the planning "
+     "calculation happens elsewhere, and planning parameters are owned by the planners."),
 ]
 
 ASSESS_GAPS = [
     ("G-16", "No constrained optimization",
      "The model plans at infinite capacity. Line utilisation is displayed in the filter panel and an "
      "aggregate line capacity figure appears in the wireframe, but neither constrains the result. "
-     "The model will propose a batch in a week the line cannot run.",
-     "This is the single largest gap. It is the capability the business specifically asked for in the "
-     "3 to 6 month window, and it is the reason the calculation cannot simply be left to SAP either.",
+     "There is no changeover matrix, no campaign grouping and no objective function.",
+     "This is the decisive gap, and it sits squarely inside MPS scope. A schedule that can propose a "
+     "batch in a week the line cannot run is a demand statement, not a production schedule. It is "
+     "also the capability that cannot simply be delegated to SAP later, because standard SAP MPS "
+     "plans at infinite capacity too.",
      "REQ-301 to REQ-312"),
-    ("G-17", "No material requirements planning",
-     "No BOM explosion, no netting of components against stock and open supply, no lead-time "
-     "offsetting, no material stock norms, no shortage or expiry exceptions.",
-     "The entire second half of the business requirement is absent. Note that Component Forecast in "
-     "this proposal is a manual input file of bundle and kit demand at finished goods level. It is "
-     "not a dependent requirement derived from a bill of material, and it must not be read as one.",
-     "REQ-501 to REQ-508"),
-    ("G-18", "Nothing is written back to SAP",
-     "The data flow runs one way: SAP to the data warehouse to the application, ending at "
-     "application build and user acceptance testing. There is no outbound interface, no Planned "
-     "Independent Requirement, no purchase requisition and no purchase order.",
-     "Without write-back this is a planning report, not a planning system. The plan cannot drive "
-     "procurement, and the loop from decision to execution stays manual.",
-     "REQ-601 to REQ-609"),
+    ("G-17", "No approval gate, no plan version, no audit trail",
+     "There is no concept of a plan version, no planner approval step, no capture of overrides with "
+     "reason codes, and no frozen zone.",
+     "A master production schedule is a commitment, not a calculation. As specified, any "
+     "recalculation silently replaces the previous answer, no one is accountable for the plan that "
+     "results, and the factory has nothing stable to execute against.",
+     "REQ-205, REQ-401, REQ-403 to REQ-408"),
+    ("G-18", "No forecast validation, versioning or locking",
+     "The demand inputs are standardised templates. No validation rules against master data, no "
+     "duplicate control, no immutable version and no lock before a planning run are described.",
+     "The schedule cannot be reproduced or defended if the demand it was built from can change "
+     "underneath it. This is also the cheapest gap on the list to close.",
+     "REQ-102 to REQ-104, REQ-107"),
     ("G-19", "Horizon is 5 months, not 12, and is stated inconsistently",
      "Section 2 specifies a rolling 5-month horizon. The wireframe shows 28 weeks, from week 41 of "
      "2026 to week 16 of 2027, which is closer to six and a half months.",
-     "A 12-month view is needed for supplier forecasting, for long lead-time materials and for the "
-     "link into the monthly S&OP cycle. Imported raw and packing materials frequently carry three "
-     "to four month lead times, so five months of visibility gives almost no warning. The internal "
+     "A 12-month view is needed for the link into the monthly S&OP cycle, for capacity planning "
+     "beyond the tactical window, and to give procurement forward visibility. The internal "
      "inconsistency also needs resolving before build.",
      "REQ-101, REQ-201"),
-    ("G-20", "No approval gate, no plan version, no audit trail",
-     "There is no concept of a plan version, no planner approval step, no capture of overrides with "
-     "reason codes, and no frozen zone.",
-     "As specified, any recalculation silently replaces the previous answer and no one is "
-     "accountable for the plan that results. This is what separates a controlled plan from a "
-     "calculated view.",
-     "REQ-205, REQ-401 to REQ-407"),
-    ("G-21", "Four of the six planning inputs are manual files",
-     "Production Plan, DP Forecast, Component Forecast and STO Forecast are all manual templates. "
-     "The production plan is marked for future replacement by a COOIS extract.",
-     "A substantial weekly hand-off burden remains in an automation project, and every manual file "
-     "is a point at which the plan can silently go stale.",
-     "REQ-101, REQ-108, REQ-607"),
-    ("G-22", "Inbound master data is too thin to support MRP later",
-     "The extraction covers SKU master, movements (ZMB51), stock (ZMB52) and sales orders (ZVA05). "
-     "There is no bill of material, no routing, no work centre capacity, no purchasing info record, "
-     "no source list and no open purchase orders.",
-     "Even if MRP were added later, this integration could not feed it. Extending to MRP would "
-     "require a second integration workstream rather than an increment.",
-     "REQ-501 to REQ-505, IF-03, IF-04, IF-06, IF-07"),
-    ("G-23", "The production quantity itself has no formula",
+    ("G-20", "The production quantity itself has no formula",
      "Section 5.1 defines three derived calculations: Policy Week, Closing Stock and Total Demand. "
      "There is no formula for Production Planned Quantity, which is the number the entire tool "
      "exists to produce. The Closing Stock formula consumes Production Planned as an input, so as "
@@ -828,13 +816,34 @@ ASSESS_GAPS = [
      "coverage target, but it is never formalised and therefore cannot be built or tested "
      "consistently. Section 9.3 of the main brief gives the step sequence that closes this.",
      "REQ-202, REQ-204"),
-    ("G-24", "Stock norm supports a single policy",
+    ("G-21", "No capacity master data in the inbound scope",
+     "The extraction covers SKU master, movements (ZMB51), stock (ZMB52) and sales orders (ZVA05). "
+     "There is no routing, no work centre, no standard rate and no shift or capacity calendar.",
+     "Constrained optimization cannot be added later without first adding this data. Treating it as "
+     "a phase 2 problem converts the constrained stage from an increment into a second integration "
+     "workstream.",
+     "REQ-302, IF-04"),
+    ("G-22", "Four of the six planning inputs are manual files",
+     "Production Plan, DP Forecast, Component Forecast and STO Forecast are all manual templates. "
+     "The production plan is marked for future replacement by a COOIS extract.",
+     "A substantial weekly hand-off burden remains in an automation project, and every manual file "
+     "is a point at which the schedule can silently go stale.",
+     "REQ-101, REQ-108, REQ-607"),
+    ("G-23", "Stock norm supports a single policy",
      "Policy Week is derived as stock policy days divided by seven. There is no fixed quantity "
      "option and no statistically derived safety stock based on demand variability and lead time at "
      "a defined service level.",
      "Days of cover alone over-stocks stable lines and under-protects volatile ones. The policy "
      "choice should be selectable per item or item class.",
      "REQ-203"),
+    ("G-24", "No defined output contract for the approved plan",
+     "The data flow terminates at application build, user acceptance testing and closure. The "
+     "approved schedule exists as a screen, not as a defined, versioned, machine-readable output.",
+     "Even with MRP out of scope today, the MPS must emit something a downstream process can "
+     "consume: an approved plan version with a stable schema, identified by version, plant, "
+     "material and bucket. Without it, whatever comes next has nothing to read, and this becomes a "
+     "rework item rather than a connection.",
+     "REQ-407, REQ-702"),
 ]
 
 ASSESS_DEFECTS = [
@@ -855,48 +864,43 @@ ASSESS_DEFECTS = [
      "window."),
     ("SD-04", "Section 4, Data Masters",
      "Component Forecast is listed as a manual input at plant and material level. The term invites "
-     "the reading that component requirements are being calculated.",
-     "Rename it to make clear it is bundle or kit demand at finished goods level, and state "
-     "explicitly that no bill of material explosion is performed."),
+     "the reading that component requirements are being calculated from a bill of material.",
+     "Rename it to make clear it is bundle or kit demand at finished goods level. This keeps the "
+     "MPS and MRP boundary unambiguous while MRP remains out of scope."),
     ("SD-05", "Section 3, Data Flow Diagram",
-     "The flow terminates at application creation, user acceptance testing and closure. No "
-     "downstream consumption of the plan is shown.",
-     "Extend the flow to show plan approval, material requirements planning and release to SAP, or "
-     "state plainly that these are out of scope so the boundary is not ambiguous."),
+     "The flow terminates at application creation, user acceptance testing and closure. No approved "
+     "plan output is shown.",
+     "Extend the flow to show plan approval and the approved plan as a defined output, so the "
+     "handover point is explicit even before anything consumes it."),
 ]
 
 ASSESS_DECISIONS = [
     ("D-06", "Which system owns master production scheduling?",
      "The vendor scope document places MPS inside SAP. The MPS Vietnam proposal places it in a SQL "
-     "calculation engine on the data warehouse. Both cannot be true.",
+     "calculation engine on the data warehouse. Both cannot be true, and both are currently funded.",
      "Supply Chain Planning and IT Architecture",
      "Until this is closed, two teams are building the same capability twice, in two different "
-     "places, with two different answers."),
+     "places, and the business will have two schedules that disagree."),
     ("D-07", "Is the new front-end application the same product as the planning portal?",
      "The vendor scope document builds a portal front end. The MPS Vietnam proposal builds a "
      "front-end planning application. If these are different products, the business is buying two "
      "planner interfaces for one process.",
      "IT Architecture",
-     "Determines whether planners work in one system or two, and whether the approval gates can be "
-     "enforced in a single place."),
-    ("D-08", "Who delivers MRP and the write-back to SAP?",
-     "Neither proposal includes BOM explosion, component netting or any outbound interface to SAP. "
-     "Between the two documents, the second half of the business requirement is unowned.",
-     "Supply Chain Planning, IT and the vendors",
-     "This is unfunded and unscheduled scope today. It will not appear by itself."),
+     "Determines whether planners work in one system or two, and whether the MPS approval gate can "
+     "be enforced in a single place."),
 ]
 
 ASSESS_ADDITIONS = [
-    ("RA-01", "Extend the horizon to 12 months",
+    ("RA-01", "Document the production quantity formula",
+     "Make the derivation from projected stock, coverage target, minimum batch and rounding "
+     "explicit and testable. Precondition to build.", "REQ-202, REQ-204"),
+    ("RA-02", "Extend the horizon to 12 months",
      "Keep weekly buckets for the current month plus three, extendable to six, and add a monthly "
      "tail to month 12.", "REQ-101, REQ-105, REQ-201"),
-    ("RA-02", "Document the production quantity formula",
-     "Make the derivation from projected stock, coverage target, minimum batch and rounding "
-     "explicit and testable.", "REQ-202, REQ-204"),
-    ("RA-03", "Add forecast versioning and locking",
-     "No planning run may execute against an unlocked or partially validated forecast version.",
-     "REQ-103, REQ-104, REQ-107"),
-    ("RA-04", "Add plan versioning and an approval gate",
+    ("RA-03", "Add forecast validation, versioning and locking",
+     "Validate against master data, block duplicates, version immutably, and prevent any planning "
+     "run against an unlocked version.", "REQ-102 to REQ-104, REQ-107"),
+    ("RA-04", "Add plan versioning and the MPS approval gate",
      "An immutable approved plan version, with planner overrides captured against user, timestamp, "
      "previous value, new value and a mandatory reason code.", "REQ-401, REQ-403, REQ-407"),
     ("RA-05", "Add the two-week frozen zone",
@@ -905,4 +909,22 @@ ASSESS_ADDITIONS = [
     ("RA-06", "Add a second stock norm policy",
      "At minimum a statistically derived safety stock option alongside days of cover, selectable "
      "per item class.", "REQ-203"),
+    ("RA-07", "Define the approved plan as a versioned output",
+     "A stable, machine-readable output keyed on plan version, plant, material and bucket, so the "
+     "schedule is a deliverable rather than only a screen.", "REQ-407"),
+    ("RA-08", "Extend inbound scope to routing, work centre and capacity",
+     "Prerequisite for the constrained stage. Cheaper to add to the current integration workstream "
+     "than to start a second one later.", "REQ-302, IF-04"),
+]
+
+ASSESS_FORWARD = [
+    ("The constrained stage", "Stage S3 is the larger half of master production scheduling and is "
+     "not in this proposal. It needs the capacity master data from RA-08, a changeover matrix at "
+     "least at product family level, and a solver. Section 9.4 of the main brief carries the model."),
+    ("Material requirements planning", "Deliberately not assessed here, and not claimed by this "
+     "proposal. It remains unaddressed by either document in circulation and will need its own "
+     "scope, owner and funding when the business is ready."),
+    ("The handover point", "Whatever consumes the schedule later - MRP, SAP, or a procurement "
+     "process - will read the approved plan. RA-07 is the cheap insurance: define that output now, "
+     "while the data model is still open."),
 ]
